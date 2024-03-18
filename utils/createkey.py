@@ -29,7 +29,6 @@ def create_keys():
         }
     }
 
-    with open('keys.json', 'w') as f:
-        json.dump(keys, f)
+    
 
     return keys

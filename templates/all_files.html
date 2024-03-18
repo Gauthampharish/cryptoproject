@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>All Files</h2>
+  <ul>
+    {% for file in files %}
+      <li>
+        ID: {{ file.id }}, 
+        File URL: {{ file.file_url }}, 
+        Sender ID: {{ file.sender_id }}, 
+        Receiver ID: {{ file.receiver_id }}, 
+        Keys URL: {{ file.keys_url }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
