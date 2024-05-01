@@ -1,0 +1,281 @@
+**SHA**
+
+1. Read the input string (message) from the user.
+2. Define the SHA-1 constants (SHA1_CONSTANTS) as [0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xCA62C1D6].
+3. Initialize the hash variables (h0, h1, h2, h3, h4) with the initial hash values:
+   - h0 = 0x67452301
+   - h1 = 0xEFCDAB89
+   - h2 = 0x98BADCFE
+   - h3 = 0x10325476
+   - h4 = 0xC3D2E1F0
+4. Pre-process the message:
+   - Append a single '1' bit to the message.
+   - Append zeros until the message length (in bits) is congruent to 448 modulo 512.
+   - Append the original message length (in bits) as a 64-bit big-endian integer.
+5. Process the message in 512-bit blocks:
+   - Break the chunk into 16 words (words[j]).
+   - Extend to 80 words using left rotation.
+   - Initialize temporary variables (a, b, c, d, e) with hash values.
+   - Perform the main loop:
+     - Calculate the function (f) and constant (k) based on the round number (j).
+     - Update the temporary variables using bitwise operations and modular arithmetic.
+   - Add the chunk's hash to the result so far.
+6. Produce the final hash value by formatting the hash variables (h0, h1, h2, h3, h4) as a hexadecimal string.
+7. Print the SHA-1 hash of the input string.
+
+Example usage:
+input_string = "Hello, World!"
+sha1_hash = sha1(input_string.encode('utf-8'))
+print("SHA-1 hash of '{}' is: {}".format(input_string, sha1_hash))
+
+
+**RSA**
+
+1. Generate Key Pair:
+   - Choose two large prime numbers, p and q.
+   - Compute n = p * q (where n is the modulus).
+   - Compute φ(n) = (p-1) * (q-1) (Euler's totient function).
+   - Choose an integer e (1 < e < φ(n)) such that gcd(e, φ(n)) = 1 (public exponent).
+   - Compute d such that d * e ≡ 1 (mod φ(n)) (private exponent).
+   - Public key: (e, n)
+   - Private key: (d, n)
+
+2. Encryption:
+   - Convert the plaintext message into a numerical representation (e.g., ASCII).
+   - Encrypt each character c using the formula: c^e mod n.
+   - The resulting ciphertext is a sequence of numbers.
+
+3. Decryption:
+   - Decrypt each ciphertext character c' using the formula: c'^d mod n.
+   - Convert the resulting numerical representation back to plaintext.
+
+
+**DSS**
+
+1. Extended Euclidean Algorithm (extended_gcd):
+   - Input: Two integers a and b
+   - Output: Greatest common divisor (g), and integers x and y such that ax + by = g
+   - If a is 0, return b, 0, 1
+   - Otherwise, recursively compute g, x, and y as extended_gcd(b % a, a)
+
+2. Modular Inverse (mod_inverse):
+   - Input: Integers a and m
+   - Output: The modular inverse of a modulo m
+   - Compute g, x, and y using extended_gcd(a, m)
+   - If g is not 1, raise an exception (modular inverse does not exist)
+   - Otherwise, return x % m
+
+3. Digital Signature Signing (digital_signature_sign):
+   - Input: Prime numbers p and q, generator g, private key x, random value k, and message
+   - Calculate H(M) (where H is a hash function, but omitted here)
+   - Compute r1 = (g^k) % q
+   - Compute s1 = (mod_inverse(k, q) * (H(M) + x * r1)) % q
+   - Return r1 and s1
+
+4. Digital Signature Verification (digital_signature_verify):
+   - Input: Prime numbers p and q, generator g, public key y, message, signature components r1 and s1
+   - Compute w = mod_inverse(s1, q)
+   - Compute u1 = (H(M) * w) % q
+   - Compute u2 = (r1 * w) % q
+   - Compute v = ((g^u1) * (y^u2)) % q
+   - If v equals r1, return True (signature verified), else return False
+
+5. Parameters:
+   - p = 283 (prime modulus)
+   - q = 47 (prime order)
+   - g = 60 (generator)
+   - x = 24 (private key)
+   - k = 5 (random value)
+   - message = 41 (message to sign)
+
+6. Signing:
+   - Compute r1 and s1 using digital_signature_sign(p, q, g, x, k, message)
+   - Print "r1:", r1
+   - Print "s1:", s1
+
+7. Verification:
+   - Compute y = (g^x) % p
+   - Verify the signature using digital_signature_verify(p, q, g, y, message, r1, s1)
+   - Print "Signature verified:", is_verified
+
+8. Signing another message:
+   - Compute r2 and s2 using digital_signature_sign(p, q, g, x, k, message2)
+   - Print "r2:", r2
+   - Print "s2:", s2
+
+9. Verification of the second message:
+   - Compute y2 = (g^x) % p
+   - Verify the signature for the second message using digital_signature_verify(p, q, g, y2, message2, r2, s2)
+   - Print "Signature verified for the second message:", is_verified2
+
+
+**MIM**
+
+1. Input prime number and primitive root:
+   - Read prime from user input
+   - Read root from user input
+
+2. Party1 (Alice) chooses a secret number:
+   - Read alicesecret from user input
+
+3. Party2 (Bob) chooses a secret number:
+   - Read bobsecret from user input
+
+4. Attacker intercepts Party1's public key intended for Party2:
+   - Compute attacker_public_to_bob = (root^alicesecret) % prime
+   - Print "Attacker intercepts Party1's public key intended for Party2:", attacker_public_to_bob
+
+5. Attacker intercepts Party2's public key intended for Party1:
+   - Compute attacker_public_to_alice = (root^bobsecret) % prime
+   - Print "Attacker intercepts Party2's public key intended for Party1:", attacker_public_to_alice
+
+6. Attacker computes their own shared keys with Party1 and Party2:
+   - Compute attacker_key_with_alice = (attacker_public_to_alice^alicesecret) % prime
+   - Compute attacker_key_with_bob = (attacker_public_to_bob^bobsecret) % prime
+
+7. Both Party1 and Party2 believe they are communicating securely with each other:
+   - Print "Attacker calculates the shared key with Party1:", attacker_key_with_alice
+   - Print "Attacker calculates the shared key with Party2:", attacker_key_with_bob
+   - Print "Both Alice and Bob are unaware that the attacker has intercepted the communication."
+
+
+**AES**
+
+1. Key Expansion:
+   a. Generate round keys from the original key using a key schedule.
+   b. Expand the original key into a set of round keys (one for each round).
+
+2. Initial Round:
+   a. Add the round key to the plaintext (XOR operation).
+
+3. Main Rounds (10, 12, or 14 rounds depending on key size):
+   a. Substitute bytes using the S-Box.
+   b. Shift rows (circular shift each row).
+   c. Mix columns (matrix multiplication with a fixed matrix).
+   d. Add the round key (XOR operation).
+
+4. Final Round:
+   a. Substitute bytes.
+   b. Shift rows.
+   c. Add the final round key.
+
+5. The ciphertext is the result after the final round.
+
+Note: AES operates on 128-bit blocks (16 bytes) and supports key sizes of 128, 192, or 256 bits.
+
+
+
+**DSA**
+
+1. Key Generation:
+   a. Choose a large prime number p.
+   b. Compute q, a smaller prime divisor of (p-1).
+   c. Choose a random integer g such that 1 < g < p and g^q mod p = 1.
+   d. Choose a private key x (0 < x < q).
+   e. Compute the public key y = g^x mod p.
+
+2. Signing:
+   a. Choose a random integer k (0 < k < q).
+   b. Compute r = (g^k mod p) mod q.
+   c. Compute s = (k^(-1) * (H(m) + x*r)) mod q, where H(m) is the hash of the message.
+   d. The signature is (r, s).
+
+3. Verification:
+   a. Compute w = s^(-1) mod q.
+   b. Compute u1 = (H(m) * w) mod q and u2 = (r * w) mod q.
+   c. Compute v = ((g^u1 * y^u2) mod p) mod q.
+   d. If v equals r, the signature is valid; otherwise, it's invalid.
+
+**playfair**
+
+1. Read the input plaintext (message) from the user.
+2. Prepare the key square (5x5 matrix) based on a given keyword:
+   - Remove duplicate letters from the keyword.
+   - Fill the key square with unique letters from the keyword (in order).
+   - Fill the remaining empty cells with the remaining letters of the alphabet (excluding 'J').
+3. Pre-process the plaintext:
+   - Convert the plaintext to uppercase.
+   - Replace any 'J' with 'I'.
+   - Split the plaintext into digraphs (pairs of two letters).
+   - If there's an odd number of letters, add a 'Z' to the last letter.
+4. Encrypt each digraph:
+   - If both letters are in the same row, take the letter to the right (wrap around if needed).
+   - If both letters are in the same column, take the letter below (wrap around if needed).
+   - If neither of the above rules applies, form a rectangle with the two letters and take the letters on the horizontal opposite corner.
+5. Combine the encrypted digraphs to form the ciphertext.
+6. Print the ciphertext.
+
+Example:
+Input plaintext: "HELLO"
+Key square: "KEYWORDABCFDGHILMNPQSTUVXZ"
+Encrypted digraphs: "HE" "LX" "LO" (using the rules above)
+Ciphertext: "HELXLO"
+
+
+
+**VIGNERE X**
+
+
+1. Read the plaintext message and the keyword.
+2. Generate the key by repeating the keyword until its length matches the plaintext.
+3. Encrypt the plaintext using the Vigenère square:
+   - For each character in the plaintext and its corresponding key character:
+     - Find the row and column of the plaintext character in the Vigenère square.
+     - Add the corresponding key character's column index to the plaintext character's row index (modulo 26).
+     - The resulting character is the ciphertext character.
+4. Print the ciphertext.
+
+Example usage:
+plaintext = "HELLO"
+keyword = "KEYWORD"
+key = generate_key(plaintext, keyword)
+ciphertext = vigenere_encrypt(plaintext, key)
+print("Ciphertext:", ciphertext)
+
+**HILL CIPHER X**
+
+1. Read the plaintext message and the key matrix (encryption key).
+2. Divide the plaintext into blocks of size n (where n is the size of the key matrix).
+3. For each block:
+   a. Convert the block into a vector of numbers (A=0, B=1, ..., Z=25).
+   b. Multiply the key matrix with the vector modulo 26.
+   c. Convert the resulting vector back to characters.
+4. Combine the encrypted blocks to form the ciphertext.
+5. Print the ciphertext.
+
+Example usage:
+plaintext = "HELLO"
+key_matrix = [[6, 24, 1], [13, 16, 10], [20, 17, 15]]
+ciphertext = hill_encrypt(plaintext, key_matrix)
+print("Ciphertext:", ciphertext)
+
+**VERMAN CIPHER X**
+
+
+1. Read the plaintext message and the key (which should be as long as the plaintext).
+2. Encrypt the plaintext using bitwise XOR with the key:
+   - Convert each character of the plaintext and the key to binary.
+   - Perform bitwise XOR operation on corresponding bits.
+   - Convert the resulting binary back to characters.
+3. Print the ciphertext.
+
+Example usage:
+plaintext = "HELLO"
+key = "SECRETKEY"
+ciphertext = vernam_encrypt(plaintext, key)
+print("Ciphertext:", ciphertext)
+
+**RAIL FENCE CIPHER X**
+
+1. Read the plaintext message and the number of rails (key).
+2. Encrypt the plaintext using the rail fence algorithm:
+   a. Create an empty matrix with rows equal to the number of rails and columns equal to the length of the plaintext.
+   b. Fill the matrix with the plaintext characters in a zigzag manner.
+   c. Read off the ciphertext row by row.
+3. Print the ciphertext.
+
+Example usage:
+plaintext = "HELLO"
+rails = 3
+ciphertext = rail_fence_encrypt(plaintext, rails)
+print("Ciphertext:", ciphertext)

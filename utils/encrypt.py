@@ -43,21 +43,3 @@ class BFishenc:
         except Exception as e:
             print(f"Error encrypting with Blowfish: {str(e)}")
             return None
-
-class ImageSteg:
-    def __init__(self, image_path):
-        self.image_path = image_path
-
-    def hide_data(self, data):
-        try:
-            secret = lsb.hide(self.image_path, data)
-           
-        except Exception as e:
-            print(f"Error hiding data in image: {str(e)}")
-
-    def reveal_data(self):
-        try:
-            return lsb.reveal(self.image_path)
-        except Exception as e:
-            print(f"Error revealing data from image: {str(e)}")
-            return None
